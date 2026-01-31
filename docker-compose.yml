@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (produção)
+  postgres:
+    image: postgres:15-alpine
+    container_name: shopee_postgres
+    environment:
+      POSTGRES_USER: shopee
+      POSTGRES_PASSWORD: shopee_pass_change_me
+      POSTGRES_DB: shopee_affiliate
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # FastAPI Application
+  api:
+    build: .
+    container_name: shopee_api
+    environment:
+      - DATABASE_URL=postgresql://shopee:shopee_pass_change_me@postgres:5432/shopee_affiliate
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # N8N Workflow Automation
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: shopee_n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=change_me_n8n_pass
+      - WEBHOOK_URL=http://localhost:5678/
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n-workflows:/workflows
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  n8n_data:
