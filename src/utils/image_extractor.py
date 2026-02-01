@@ -42,7 +42,7 @@ EXCLUDE_PATTERNS = [
     r'.*like.*',
     r'.*heart.*',
     r'.*free.*shipping.*',
-    r'.*\_ss.*',  # Small size
+    r'.*_ss.*',  # Small size
     r'.*100x100.*',  # Thumbnails muito pequenas
     r'.*50x50.*',
     r'.*_tn\..*',  # Thumbnails

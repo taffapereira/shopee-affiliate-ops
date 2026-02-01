@@ -104,10 +104,9 @@ class TestGenerateHashtags:
             include_base=False
         )
         
-        # Não deve ter tags base
-        assert "shopee" not in hashtags
-        assert "oferta" not in hashtags
-        assert "promocao" not in hashtags
+        # Não deve ter nenhuma tag base
+        base_tags = ['shopee', 'oferta', 'promocao']
+        assert not any(tag in hashtags for tag in base_tags)
 
 
 class TestFormatHashtags:

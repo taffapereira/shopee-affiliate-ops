@@ -2,6 +2,7 @@
 Sistema de agendamento de publicações
 Gerencia horários de postagem para diferentes canais
 """
+import time as time_module
 from datetime import datetime, time, timedelta
 from typing import List, Dict, Optional, Callable
 from zoneinfo import ZoneInfo
@@ -228,7 +229,6 @@ class PostScheduler:
         while self._running:
             schedule.run_pending()
             # Dorme 30 segundos entre checks
-            import time as time_module
             time_module.sleep(30)
     
     def start(self, blocking: bool = False):

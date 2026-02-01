@@ -120,7 +120,8 @@ def generate_hashtags(
     keywords = extract_keywords(product_name)
     
     # Adiciona as primeiras keywords (limite de 3-4 do nome do produto)
-    product_keywords_limit = min(4, max_hashtags - 3) if include_base else max_hashtags
+    base_count = len(HASHTAGS_BASE) if include_base else 0
+    product_keywords_limit = min(4, max_hashtags - base_count) if include_base else max_hashtags
     hashtags.extend(keywords[:product_keywords_limit])
     
     # 2. Adiciona hashtags do nicho
