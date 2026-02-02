@@ -1,7 +1,9 @@
 """
 Templates para Grupo Telegram - 5 tipos
 """
-from typing import Dict
+from typing import Dict, Optional
+
+from src.utils.hashtags import generate_hashtags_string
 
 
 class GrupoTemplate:
@@ -10,6 +12,20 @@ class GrupoTemplate:
     def __init__(self, nome: str, descricao: str):
         self.nome = nome
         self.descricao = descricao
+    
+    def _get_hashtags(self, produto: Dict) -> str:
+        """
+        Gera hashtags para o produto
+        
+        Args:
+            produto: Dados do produto
+            
+        Returns:
+            String com hashtags formatadas
+        """
+        nome = produto.get('nome', '')
+        nicho = produto.get('nicho')
+        return generate_hashtags_string(nome, nicho, max_hashtags=7)
     
     def generate(self, produto: Dict, link: str) -> str:
         """
@@ -45,10 +61,12 @@ class OfertaCompletaTemplate(GrupoTemplate):
             "pet": "🐾",
             "cosmeticos": "💄"
         }
-        emoji = emoji_map.get(produto.get('nicho'), "⭐")
+        emoji = emoji_map.get(produto.get('nicho'), "🛍️")
         
-        message = f"""{emoji} **{produto.get('nome')}**
-
+        # Gera hashtags baseadas no produto
+        hashtags = self._get_hashtags(produto)
+        
+        message = f"""{emoji} {produto.get('nome')}
 💰 R$ {preco:.2f}"""
         
         if desconto > 0:
@@ -58,12 +76,9 @@ class OfertaCompletaTemplate(GrupoTemplate):
         
         message += f"""
 
-✅ Rating: {produto.get('rating', 0):.1f}⭐ ({produto.get('total_avaliacoes', 0)} avaliações)
-✅ {produto.get('total_vendas', 0)} vendas
+{hashtags}
 
-🔗 {link}
-
-{DISCLAIMER}"""
+🔗 {link}"""
         
         return message
 
@@ -82,19 +97,19 @@ class UrgenteTemplate(GrupoTemplate):
         preco_original = produto.get('preco_original', 0)
         desconto = produto.get('desconto_percentual', 0)
         
-        message = f"""🚨 CORRE! PROMOÇÃO RELÂMPAGO
-
-{produto.get('nome')}
+        # Gera hashtags baseadas no produto
+        hashtags = self._get_hashtags(produto)
+        
+        message = f"""🚨 {produto.get('nome')}
 
 De: ~~R$ {preco_original:.2f}~~
 Por: R$ {preco:.2f} 💥
 
 {desconto:.0f}% DE DESCONTO!
 
-Aproveita antes que acabe! 👇
-{link}
+{hashtags}
 
-{DISCLAIMER}"""
+👇 {link}"""
         
         return message
 
@@ -111,8 +126,14 @@ class MinimalistaTemplate(GrupoTemplate):
     def generate(self, produto: Dict, link: str) -> str:
         preco = produto.get('preco_promocional') or produto.get('preco_original', 0)
         
-        message = f"""{produto.get('nome')}
-R$ {preco:.2f}
+        # Gera hashtags baseadas no produto
+        hashtags = self._get_hashtags(produto)
+        
+        message = f"""🛍️ {produto.get('nome')}
+💰 R$ {preco:.2f}
+
+{hashtags}
+
 {link}"""
         
         return message
@@ -134,19 +155,19 @@ class ComparativoPrecoTemplate(GrupoTemplate):
         # Simula preço "em outros lugares" (15% a mais)
         preco_outros = preco * 1.15
         
-        message = f"""💰 ACHADO DE PREÇO!
-
-{produto.get('nome')}
+        # Gera hashtags baseadas no produto
+        hashtags = self._get_hashtags(produto)
+        
+        message = f"""💰 {produto.get('nome')}
 
 🏪 Em outros lugares: R$ {preco_outros:.2f}
 🛒 Na Shopee: R$ {preco:.2f}
 
 💵 Você economiza: R$ {preco_outros - preco:.2f}
 
-Pega logo! 👇
-{link}
+{hashtags}
 
-{DISCLAIMER}"""
+👇 {link}"""
         
         return message
 
@@ -164,16 +185,22 @@ class ListaAchadosTemplate(GrupoTemplate):
         preco = produto.get('preco_promocional') or produto.get('preco_original', 0)
         desconto = produto.get('desconto_percentual', 0)
         
+        # Gera hashtags baseadas no produto
+        hashtags = self._get_hashtags(produto)
+        
         emoji = "🔥" if desconto > 30 else "✨"
         
         message = f"""{emoji} {produto.get('nome')}
-   R$ {preco:.2f}"""
+💰 R$ {preco:.2f}"""
         
         if desconto > 0:
             message += f" ({desconto:.0f}% OFF)"
         
         message += f"""
-   {link}"""
+
+{hashtags}
+
+{link}"""
         
         return message
 
